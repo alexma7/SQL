@@ -1,0 +1,108 @@
+--Удаление таблицы, если существует
+IF OBJECT_ID('tempdb..#err') IS NOT NULL DROP TABLE #err
+
+--Обработка ошибок
+BEGIN TRY
+  --Выполняем какой-то запрос
+END TRY 
+BEGIN CATCH
+  --Заходим сюда, если появляется ошибка в запросе
+  IF @@TRANCOUNT > 0 
+  	ROLLBACK; --Проверяем открытые транзакции и, если они не закрыты, то закрываем их
+	
+	--Производим запись ошибок в журнал
+	INSERT Journal (txt, errorTxt, error, dTime, userName, idParentMobil)
+	SELECT 
+		'Ошибка в процедуре '+ CAST(ERROR_PROCEDURE() AS NVARCHAR(200)) +' На линии '+ CAST(ERROR_LINE() AS NVARCHAR(200)),
+		ERROR_MESSAGE(), 
+		1, 
+		GETDATE(), 
+		SUSER_SNAME() AS userName,  
+		@idParentMobil 
+	THROW;  -- команда выполняет вывод сообщений об ошибках в окно с сообщениями
+END CATCH
+
+--Создание новых процедур
+USE [База данных]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[Название процедуры]  
+	@Param AS INT, --параметр 1
+	@DateBegin AS DATETIME = NULL -- параметр 2 значение null, если параметр не передан
+AS
+BEGIN
+	--Сама процедура
+END
+
+--Курсор
+--Описываем и открываем курсор
+		DECLARE MyCursor CURSOR FOR
+		--Вставляем в курсор номера из таблицы SprParentMobil, что бы произвести их перечисление в последующих операциях
+		SELECT IdParentMobil FROM SprParentMobil WHERE actual = 1
+		--Открываем курсор, в котором находятся номера из предыдущего запроса
+		OPEN MyCursor
+		--Вставляем данные из курсора в переменную, для дальнейшего использования
+		FETCH FROM MyCursor INTO @idParentMobil
+		
+		-- Получаем количество актульных idParentMobil, которые необходимо выгружать
+		SET @i = (SELECT COUNT(*) FROM SprParentMobil WHERE actual = 1 )  
+
+		WHILE @i>0
+		BEGIN
+			--Выполняем код с полученным значением от курсора
+			--КОД
+			--После использования значения из курсора, нам необходимо получить следующее, для этого используется следующая строка
+			FETCH NEXT FROM MyCursor INTO @idParentMobil;
+			SET @i = @i-1
+		END
+		--Закрываем курсор
+		CLOSE MyCursor; 
+		--Уничтожаем его
+		DEALLOCATE MyCursor;
+		
+		-- Во временные таблицы можно заносить данные, которые вставились в другую таблицу
+		INSERT INTO nameTbl (*)
+				OUTPUT inserted.event_id,  @event_type_new, inserted.[OBJECT_ID] 							
+				INTO @TempTbl
+		SELECT *
+		FROM 
+		
+		--Транзикции
+		--Начало транзикции
+		BEGIN TRAN
+		--Подтверждение транзакции
+		COMMIT TRAN;
+		--Откат транзакции (обычто ставиться в блок CATCH)
+		ROLLBACK TRAN;
+		
+		--
+		SELECT поля таблицы
+		INTO #имя таблицы, либо временная, либо создастся автоматически
+		FROM Имя таблицы откуда брать данные
+		
+		
+		
+		
+		
+		
+		
+		/****************************************************************************/
+		--ФУНКЦИИ
+		--Преобразовываем формат датаВремя в дату
+		CAST(GETDATE() AS DATE)
+		
+		--Добавляем 4 часа
+		--DATEADD(HOUR,-4, CAST(@DateBegin AS DATETIME))
+		
+		--Конвертируем дату время в строку и ставим формат времени
+		CONVERT(NVARCHAR, @DateBegin, 21)
+		
+		
+		
+		
+		--ОКОННЫЕ ФУНКЦИИ
+		--Получаем последнюю запись в таблице
+		ROW_NUMBER() OVER(ORDER BY dataBegin) AS OBJECT_ID
