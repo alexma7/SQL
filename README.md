@@ -6,7 +6,7 @@
 2. [Создание первого проекта](#Создание-первого-проекта)
 3. [тест](test)
 4. [INSERT](#INSERT) 
-click [lin](#1.1-My)
+5. [lin](#1.1-My)
 
 ## INSERT2
 , DELETE, UPDATE, CREATE, вставка, удаление, обновление
@@ -82,3 +82,9 @@ DEALLOCATE MyCursor;
 
 
 # 1.1-My
+```SQL
+--Описываем и открываем курсор
+DECLARE MyCursor CURSOR FOR
+--Вставляем в курсор номера из таблицы SprParentMobil, что бы произвести их перечисление в последующих операциях
+SELECT IdPare
+```
