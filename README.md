@@ -8,6 +8,14 @@
 4. [INSERT](#INSERT) 
 5. [lin](#1.1-My)
 
+## ПЕРЕНЕСТИ
+```SQL
+--Изменить кодировку столбца, что бы не выскакивала ошибка
+ALTER TABLE trash.dbo.class20220804
+ALTER COLUMN lvl5 VARCHAR(250) COLLATE SQL_Latin1_General_CP1251_CI_AS
+```
+
+
 ## INSERT2
 , DELETE, UPDATE, CREATE, вставка, удаление, обновление
 ```SQL
